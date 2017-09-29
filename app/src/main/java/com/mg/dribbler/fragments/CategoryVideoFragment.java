@@ -107,7 +107,7 @@ public class CategoryVideoFragment extends Fragment {
                 super.onSuccess(statusCode, headers, response);
                 UIUtil.dismissProgressDialog(mActivity);
                 mFilterTrickArray = ParseServiceManager.parseTrickResponse(response);
-                mRecyclerAdapter.notifyDataSetChanged();
+                categoryVideoAdapter.notifyDataSetChanged();
             }
         });
     }
@@ -209,9 +209,8 @@ public class CategoryVideoFragment extends Fragment {
             convertView.findViewById(R.id.rl_panel).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    final Trick trick = mCategory.tricks.get(position);
-                    //APIServiceManager.getTrickInfo(mActivity, trick.trick_id);
-                    Global.sharedInstance().selectedTrick = mCategory.tricks.get(position);
+                    final Trick trick = mFilterTrickArray.get(position);
+                    Global.sharedInstance().selectedTrick = mFilterTrickArray.get(position);
                     goToVideoDetailPage();
                 }
             });

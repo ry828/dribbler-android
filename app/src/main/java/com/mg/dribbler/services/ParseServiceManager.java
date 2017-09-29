@@ -152,29 +152,35 @@ public class ParseServiceManager {
         ArrayList<Trick> tricks = new ArrayList<>();
 
         for (int j = 0; j < trickArr.length(); j++) {
-            JSONObject trickObj = (JSONObject) trickArr.get(j);
-            Trick trick = new Trick();
-            trick.trick_id = trickObj.getInt("trick_id");
-            trick.category_id = trickObj.getInt("category_id");
-            trick.trick_title = trickObj.getString("trick_title");
-//                    trick.trick_tags = trickObj.getString("trick_tags");
-//                    trick.tagArr = new ArrayList<>(Arrays.asList(trickObj.getString("trick_tags").split("\\s*,\\s*")));
-            trick.thumbnail_url = trickObj.getString("trick_thumbnail");
-            trick.ld_video_url = trickObj.getString("ld_video_url");
-            trick.hd_video_url = trickObj.getString("hd_video_url");
+            JSONObject trickObj = null;
+            try {
+                trickObj = (JSONObject) trickArr.get(j);
+                Trick trick = new Trick();
+                trick.trick_id = trickObj.getInt("trick_id");
+                trick.category_id = trickObj.getInt("category_id");
+                trick.trick_title = trickObj.getString("trick_title");
+                trick.trick_tags = trickObj.getString("trick_tags");
+                trick.tagArr = new ArrayList<>(Arrays.asList(trickObj.getString("trick_tags").split("\\s*,\\s*")));
+                trick.thumbnail_url = trickObj.getString("trick_thumbnail");
+                trick.ld_video_url = trickObj.getString("ld_video_url");
+                trick.hd_video_url = trickObj.getString("hd_video_url");
 
-            String jsonStr = trickObj.getString("trick_description");
-            JSONArray descriptionArr = new JSONArray(jsonStr);
-            for (int k = 0; k < descriptionArr.length(); k++) {
-                JSONObject descriptionObj = (JSONObject) descriptionArr.get(k);
-                TrickDescription description = new TrickDescription();
-                description.title = descriptionObj.getString("title");
-                description.thumbnail = descriptionObj.getString("thumbnail");
-                description.description = descriptionObj.getString("description");
-                trick.descriptions.add(description);
+                String jsonStr = trickObj.getString("trick_description");
+                JSONArray descriptionArr = new JSONArray(jsonStr);
+                for (int k = 0; k < descriptionArr.length(); k++) {
+                    JSONObject descriptionObj = (JSONObject) descriptionArr.get(k);
+                    TrickDescription description = new TrickDescription();
+                    description.title = descriptionObj.getString("title");
+                    description.thumbnail = descriptionObj.getString("thumbnail");
+                    description.description = descriptionObj.getString("description");
+                    trick.descriptions.add(description);
+                }
+
+                tricks.add(trick);
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
 
-            tricks.add(trick);
         }
 
         return tricks;
@@ -454,26 +460,18 @@ public class ParseServiceManager {
         }
         return arrayList;
     }
-    public static ArrayList<Score> parseCategoryStatistic(JSONObject response) {
+    public static ArrayList<Score> parseCategoryStatistic(JSONArray response) {
         ArrayList<Score> arrayList = new ArrayList<>();
-
-        try {
-            Score score1 = new Score();
-            score1.title = "Beginner";
-            score1.score = response.getDouble("BEGINNER");
-            arrayList.add(score1);
-
-            Score score2 = new Score();
-            score2.title = "Advanced";
-            score2.score = response.getDouble("ADANCED");
-            arrayList.add(score2);
-
-            Score score3 = new Score();
-            score3.title = "Professional";
-            score3.score = response.getDouble("PREOFESSIONAL");
-            arrayList.add(score3);
-        } catch (JSONException e) {
-            e.printStackTrace();
+        for (int i = 0; i < response.length(); i ++) {
+            try {
+                JSONObject object = response.getJSONObject(i);
+                Score score = new Score();
+                score.title = object.getString("title");
+                score.score = object.getDouble("score");
+                arrayList.add(score);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
         return arrayList;
     }

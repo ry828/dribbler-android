@@ -137,7 +137,7 @@ public class ProfileOverviewFragment extends Fragment {
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
                 try {
-                    myCategoryScore = ParseServiceManager.parseCategoryStatistic(response.getJSONObject("overview"));
+                    myCategoryScore = ParseServiceManager.parseCategoryStatistic(response.getJSONArray("overview"));
                     myTagScore = ParseServiceManager.parseTagStatistic(response.getJSONArray("tag_statistic"));
                     sendNotification(mActivity, AppConstant.BROADCAST_GET_OTHER_PROFILE_STATISTICS);
                 } catch (Exception exception) {
@@ -284,11 +284,14 @@ public class ProfileOverviewFragment extends Fragment {
 
     public void setData() {
         ArrayList<RadarEntry> entries1 = new ArrayList<RadarEntry>();
+        final ArrayList<String> arrTitles = new ArrayList();
         // NOTE: The order of the entries when being added to the entries array determines their position around the center of the chart.
         for (int i = 0; i < myCategoryScore.size(); i ++) {
             Score score = myCategoryScore.get(i);
             float val = score.score.floatValue();
             entries1.add(new RadarEntry(val, score.title));
+
+            arrTitles.add(score.title + " \n" + String.valueOf(score.score));
         }
         RadarDataSet set1 = new RadarDataSet(entries1, "");
         set1.setColor(Color.rgb(103, 110, 129));
@@ -316,13 +319,10 @@ public class ProfileOverviewFragment extends Fragment {
         if (myCategoryScore.size() > 2) {
             xAxis.setValueFormatter(new IAxisValueFormatter() {
 
-                private String[] mActivities = new String[]{"Beginner\n" + String.valueOf(myCategoryScore.get(0).score)
-                        , "Advanced\n" + String.valueOf(myCategoryScore.get(1).score)
-                        , "Professional\n" + String.valueOf(myCategoryScore.get(2).score)};
 
                 @Override
                 public String getFormattedValue(float value, AxisBase axis) {
-                    return mActivities[(int) value % mActivities.length];
+                    return arrTitles.get((int) value % arrTitles.size());
                 }
             });
         }
