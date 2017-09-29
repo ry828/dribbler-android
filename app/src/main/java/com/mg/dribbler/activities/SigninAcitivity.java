@@ -93,6 +93,9 @@ public class SigninAcitivity extends AppCompatActivity {
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                 super.onFailure(statusCode, headers, responseString, throwable);
                 UIUtil.dismissProgressDialog(SigninAcitivity.this);
+                if (statusCode == 401) {//user is not verified yet
+
+                }
             }
         });
     }

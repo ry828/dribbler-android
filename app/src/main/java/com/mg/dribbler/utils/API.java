@@ -7,6 +7,7 @@ public class API {
 
     public static String LOGIN = BASE_URL + "/users/me";
     public static String REGISTER = BASE_URL + "/users/register";
+    public static String VERIFY = BASE_URL + "/users/verify";
     public static String FORGOT_PASSWORD = BASE_URL + "/password/forgot";
     public static String GET_TAGS = BASE_URL + "/tags";
     public static String GET_CATEGORIES = BASE_URL + "/categories";
