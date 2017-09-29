@@ -1,8 +1,11 @@
 package com.mg.dribbler.activities;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
@@ -28,7 +31,7 @@ public class SigninAcitivity extends AppCompatActivity {
 
     private EditText etEmail, etPassword;
     private TextView tvForgot;
-    private String mEmail, mPassword;
+    private String mEmail, mPassword, verifyCode = "";
     private Button btnLogin;
 
     @Override
@@ -94,7 +97,7 @@ public class SigninAcitivity extends AppCompatActivity {
                 super.onFailure(statusCode, headers, responseString, throwable);
                 UIUtil.dismissProgressDialog(SigninAcitivity.this);
                 if (statusCode == 401) {//user is not verified yet
-
+                    inputVerifyCode();
                 }
             }
         });
@@ -119,5 +122,63 @@ public class SigninAcitivity extends AppCompatActivity {
         Intent intent = new Intent(SigninAcitivity.this, MainActivity.class);
         startActivity(intent);
         finish();
+    }
+
+    void inputVerifyCode() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Please insert verify code");
+        final EditText input = new EditText(this);
+        input.setInputType(InputType.TYPE_TEXT_VARIATION_NORMAL);
+        builder.setView(input);
+        builder.setPositiveButton("Verify", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                verifyCode = input.getText().toString();
+                verify();
+                dialog.cancel();
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        builder.setCancelable(true);
+        builder.show();
+    }
+    private void verify() {
+        if (!checkValidation()) {
+            return;
+        }
+
+        RequestParams params = new RequestParams();
+        params.put("email", mEmail);
+        params.put("confirmation_code", verifyCode);
+
+        // Call API
+        UIUtil.showProgressDialog(this, "Verifying...");
+        WebServiceManager.post(this, API.VERIFY, params, new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+                UIUtil.dismissProgressDialog(SigninAcitivity.this);
+                UIUtil.showAlertDialog(SigninAcitivity.this, "Dribbler", "Verification success! Please login.", "OK");
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                super.onFailure(statusCode, headers, throwable, errorResponse);
+                UIUtil.dismissProgressDialog(SigninAcitivity.this);
+                String error = WebServiceManager.getErrorMesssage(errorResponse);
+                UIUtil.showAlertDialog(SigninAcitivity.this, error, "", "OK");
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                super.onFailure(statusCode, headers, responseString, throwable);
+                UIUtil.dismissProgressDialog(SigninAcitivity.this);
+            }
+        });
     }
 }
