@@ -151,32 +151,7 @@ public class ProfileOverviewFragment extends Fragment {
             }
         });
     }
-    /**
-     * Load Profile Status
-     */
-    public void loadProfileStatus() {
-        String endPoint = String.format(API.GET_PROFILE_STATUS, selectedUser.userID);
-        WebServiceManager.getWithToken(mActivity, endPoint, new JsonHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                super.onSuccess(statusCode, headers, response);
-                try {
-                    myCategoryScore = ParseServiceManager.parseScoreResponse(response.getJSONArray("category"), "category");
-                    myTagScore = ParseServiceManager.parseScoreResponse(response.getJSONArray("tag"), "tag");
-//                    myTrickScore = ParseServiceManager.parseScoreResponse(response.getJSONArray("trick"), "trick");
-                    sendNotification(mActivity, AppConstant.BROADCAST_GET_OTHER_PROFILE_STATISTICS);
 
-                } catch (Exception exception) {
-                    Log.e("Parse Error", "Profile Status");
-                }
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                super.onFailure(statusCode, headers, responseString, throwable);
-            }
-        });
-    }
     /**
      * Send Broadcast event
      */
@@ -254,15 +229,7 @@ public class ProfileOverviewFragment extends Fragment {
         xAxis.setYOffset(0f);
         xAxis.setXOffset(0f);
         xAxis.setTextColor(Color.parseColor("#b8b8b8"));
-        xAxis.setValueFormatter(new IAxisValueFormatter() {
 
-            private String[] mActivities = new String[]{"Beginner", "Advanced", "Professional"};
-
-            @Override
-            public String getFormattedValue(float value, AxisBase axis) {
-                return mActivities[(int) value % mActivities.length];
-            }
-        });
 
         YAxis yAxis = mChart.getYAxis();
         yAxis.setLabelCount(3, false);
